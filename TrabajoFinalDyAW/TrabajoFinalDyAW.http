@@ -1,0 +1,6 @@
+@TrabajoFinalDyAW_HostAddress = http://localhost:5159
+
+GET {{TrabajoFinalDyAW_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
