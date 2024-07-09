@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TrabajoFinalDyAW.DTOs;
 using TrabajoFinalDyAW.Models;
 using TrabajoFinalDyAW.Presenters;
 using TrabajoFinalDyAW.Responses;
+using TrabajoFinalDyAW.Utils;
 
 namespace TrabajoFinalDyAW.Controllers
 {
@@ -34,6 +37,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <response code="401">No autorizado</response>
         /// <response code="403">No tenes permisos para realizar esta accion</response>
         /// <response code="500">Error interno del servidor</response>
+        [Authorize(Policy = "GET_USER")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserPresenter>), 200)]
         public async Task<ActionResult<IEnumerable<UserPresenter>>> GetAllUsers()
@@ -60,6 +64,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <response code="404">No se encontro el usuario</response>
         /// <response code="403">No tenes permisos para realizar esta accion</response>
         /// <response code="500">Error interno del servidor</response>
+        [Authorize(Policy = "GET_USER")]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UserPresenter), 200)]
         [ProducesResponseType(typeof(BadRequestResponse), 400)]
@@ -97,6 +102,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <response code="404">No se encontro el usuario</response>
         /// <response code="409">Un usuario con esos datos ya existe</response>
         /// <response code="500">Error interno del servidor</response>
+        [Authorize(Policy = "CREATE_USER")]
         [HttpPost]
         [ProducesResponseType(typeof(Created<UserPresenter>), 201)]
         [ProducesResponseType(typeof(BadRequestResponse), 400)]
@@ -111,6 +117,7 @@ namespace TrabajoFinalDyAW.Controllers
 
             var user = _mapper.Map<Entities.User>(body);
             user.Id = Guid.NewGuid();
+            user.Password = HashUtil.GenerateSHA256Hash(user.Password);
             var model = _mapper.Map<Models.User>(user);
 
             _context.Add(model);

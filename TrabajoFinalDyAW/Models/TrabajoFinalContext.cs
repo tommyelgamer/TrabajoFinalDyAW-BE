@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace TrabajoFinalDyAW.Models;
 
@@ -17,6 +16,8 @@ public partial class TrabajoFinalContext : DbContext
     public virtual DbSet<Merchandise> Merchandise { get; set; }
 
     public virtual DbSet<Permissionclaim> Permissionclaim { get; set; }
+
+    public virtual DbSet<Refreshtoken> Refreshtoken { get; set; }
 
     public virtual DbSet<User> User { get; set; }
 
@@ -60,6 +61,28 @@ public partial class TrabajoFinalContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("permissionclaim_name");
+        });
+
+        modelBuilder.Entity<Refreshtoken>(entity =>
+        {
+            entity.ToTable("refreshtoken");
+
+            entity.Property(e => e.RefreshtokenId)
+                .ValueGeneratedNever()
+                .HasColumnName("refreshtoken_id");
+            entity.Property(e => e.RefreshtokenExpire)
+                .HasColumnType("datetime")
+                .HasColumnName("refreshtoken_expire");
+            entity.Property(e => e.RefreshtokenValue)
+                .IsRequired()
+                .HasColumnType("text")
+                .HasColumnName("refreshtoken_value");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Refreshtoken)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_refreshtoken_user");
         });
 
         modelBuilder.Entity<User>(entity =>

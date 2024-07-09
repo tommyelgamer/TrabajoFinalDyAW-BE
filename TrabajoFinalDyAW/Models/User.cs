@@ -13,5 +13,7 @@ public partial class User
 
     public string UserPassword { get; set; }
 
+    public virtual ICollection<Refreshtoken> Refreshtoken { get; set; } = new List<Refreshtoken>();
+
     public virtual ICollection<Userpermisssionclaim> Userpermisssionclaim { get; set; } = new List<Userpermisssionclaim>();
 }
