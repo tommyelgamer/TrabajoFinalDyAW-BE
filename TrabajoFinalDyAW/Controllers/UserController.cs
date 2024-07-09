@@ -32,7 +32,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <summary>
         /// Obtener usuarios del sistema
         /// </summary>
-        /// <remarks>Obtener todos los usuarios creados en el sistema. Requiere el claim de GET_USER </remarks>
+        /// <remarks>Obtener todos los usuarios creados en el sistema. Requiere el claim de GET_USER</remarks>
         /// <response code="200">Listado de usuarios</response>
         /// <response code="401">No autorizado</response>
         /// <response code="403">No tenes permisos para realizar esta accion</response>
@@ -57,7 +57,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <summary>
         /// Obtener un usuario por su ID
         /// </summary>
-        /// <remarks>Obtener un usuario por su I. Requiere el claim de GET_USER</remarks>
+        /// <remarks>Obtener un usuario por su Id. Requiere el claim de GET_USER</remarks>
         /// <response code="200">Usuario</response>
         /// <response code="400">ID no valida</response>
         /// <response code="401">No autorizado</response>
@@ -99,7 +99,6 @@ namespace TrabajoFinalDyAW.Controllers
         /// <response code="400">ID no valida</response>
         /// <response code="401">No autorizado</response>
         /// <response code="403">No tenes permisos para realizar esta accion</response>
-        /// <response code="404">No se encontro el usuario</response>
         /// <response code="409">Un usuario con esos datos ya existe</response>
         /// <response code="500">Error interno del servidor</response>
         [Authorize(Policy = "CREATE_USER")]
@@ -130,6 +129,104 @@ namespace TrabajoFinalDyAW.Controllers
                     _mapper.Map<Entities.User>(model)
                 )
             );
+        }
+
+        /// <summary>
+        /// Actualizar un usuario
+        /// </summary>
+        /// <remarks>Actualizar un usuario. Requiere el claim de UPDATE_USER</remarks>
+        /// <response code="200">Usuario</response>
+        /// <response code="400">Datos de la solicitud no validos</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="403">No tenes permisos para realizar esta accion</response>
+        /// <response code="404">No se encontro el usuario</response>
+        /// <response code="500">Error interno del servidor</response>
+        [Authorize(Policy = "UPDATE_USER")]
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(Created<UserPresenter>), 201)]
+        [ProducesResponseType(typeof(BadRequestResponse), 400)]
+        [ProducesResponseType(typeof(NotFoundResult), 404)]
+        public async Task<ActionResult<UserPresenter>> UpdateUser([FromRoute] string id, [FromBody] UpdateUserDto body)
+        {
+            if (!Guid.TryParse(id, out var userId)) return BadRequest("User id is not a Guid");
+
+            var existingUser = await (from u in _context.User.Include(u => u.Userpermisssionclaim)
+                                      where u.UserId == Guid.Parse(id)
+                                      select u).ToListAsync();
+
+            if (existingUser.Count <= 0) return NotFound();
+
+            if (body.Username != null)
+            {
+                existingUser[0].UserUsername = body.Username;
+            }
+
+            if (body.Password != null)
+            {
+                existingUser[0].UserPassword = HashUtil.GenerateSHA256Hash(body.Password);
+            }
+
+            if (body.Permissions != null)
+            {
+                var bodyPermissions = body.Permissions.ToList();
+                var userPermissions = existingUser[0].Userpermisssionclaim;
+                foreach (var permission in userPermissions)
+                {
+                    var p = bodyPermissions.Find(p => p == permission.PermissionclaimName);
+                    if (p == null)
+                    {
+                        _context.Userpermisssionclaim.Remove(permission);
+                    } else
+                    {
+                        bodyPermissions.Remove(p);
+                    }
+                }
+
+                foreach (var permission in bodyPermissions)
+                {
+                    existingUser[0].Userpermisssionclaim.Add(new Userpermisssionclaim { UserpermissionclaimId = Guid.NewGuid(), PermissionclaimName = permission, UserId = existingUser[0].UserId });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(
+                _mapper.Map<UserPresenter>(
+                    _mapper.Map<Entities.User>(existingUser[0])
+                )
+            );
+        }
+
+        /// <summary>
+        /// Eliminar un usuario
+        /// </summary>
+        /// <remarks>Eliminar un usuario. Requiere el claim de DELETE_USER</remarks>
+        /// <response code="200">Vacia</response>
+        /// <response code="400">Datos de la solicitud no validos</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="403">No tenes permisos para realizar esta accion</response>
+        /// <response code="404">No se encontro el usuario</response>
+        /// <response code="500">Error interno del servidor</response>
+        [Authorize(Policy = "DELETE_USER")]
+        [HttpDelete("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(BadRequestResponse), 400)]
+        [ProducesResponseType(typeof(NotFoundResult), 404)]
+        public async Task<ActionResult> DeleteUser([FromRoute] string id)
+        {
+            if (!Guid.TryParse(id, out var userId)) return BadRequest("User id is not a Guid");
+
+            var existingUser = await (from u in _context.User.Include(u => u.Userpermisssionclaim)
+                                      where u.UserId == Guid.Parse(id)
+                                      select u).ToListAsync();
+
+            if (existingUser.Count <= 0) return NotFound();
+
+            _context.User.Remove(existingUser[0]);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace TrabajoFinalDyAW.MapperProfiles
                 )
                 .ForMember(
                     dest => dest.Userpermisssionclaim,
-                    opt => opt.MapFrom(u => u.Claims.Select(c => new Userpermisssionclaim { UserId = u.Id, PermissionclaimName = c }))
+                    opt => opt.MapFrom(u => u.Permissions.Select(c => new Userpermisssionclaim { UserpermissionclaimId = Guid.NewGuid(), UserId = u.Id, PermissionclaimName = c }))
                 );
             CreateMap<Models.User, Entities.User>()
                 .ForMember(
@@ -37,7 +37,7 @@ namespace TrabajoFinalDyAW.MapperProfiles
                     opt => opt.MapFrom(u => u.UserPassword)
                 )
                 .ForMember(
-                    dest => dest.Claims,
+                    dest => dest.Permissions,
                     opt => opt.MapFrom(u => u.Userpermisssionclaim.Select(c => c.PermissionclaimName))
                 );
             CreateMap<Entities.User, Presenters.UserPresenter>();

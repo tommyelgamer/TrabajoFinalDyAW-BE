@@ -74,14 +74,12 @@ public partial class TrabajoFinalContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("refreshtoken_expire");
             entity.Property(e => e.RefreshtokenValue)
-                .IsRequired()
-                .HasColumnType("text")
+                .IsUnicode(false)
                 .HasColumnName("refreshtoken_value");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.Refreshtoken)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_refreshtoken_user");
         });
 
@@ -129,7 +127,6 @@ public partial class TrabajoFinalContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Userpermisssionclaim)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_userpermisssionclaim_user");
         });
 

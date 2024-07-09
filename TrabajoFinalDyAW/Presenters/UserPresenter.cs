@@ -4,6 +4,6 @@
     {
         public string Id { get; set; }
         public string Username { get; set; }
-        public IEnumerable<string> Claims { get; set; }
+        public IEnumerable<string> Permissions { get; set; }
     }
 }

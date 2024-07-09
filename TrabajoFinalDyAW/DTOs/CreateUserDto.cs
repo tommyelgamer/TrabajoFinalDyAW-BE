@@ -10,6 +10,6 @@ namespace TrabajoFinalDyAW.DTOs
         [Required]
         [StringLength(255, MinimumLength = 8)]
         public string Password { get; set; }
-        public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<string> Permissions { get; set; } = Enumerable.Empty<string>();
     }
 }
