@@ -41,6 +41,13 @@ namespace TrabajoFinalDyAW.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Obtener token utilizando el usuario y contraseña
+        /// </summary>
+        /// <remarks>Obtener token utilizando el usuario y contraseña</remarks>
+        /// <response code="200">Token</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="500">Error interno del servidor</response>
         [Route("login/basic")]
         [HttpPost]
         [ProducesResponseType(typeof(AuthenticatedPresenter), 200)]
@@ -102,6 +109,13 @@ namespace TrabajoFinalDyAW.Controllers
             return Unauthorized();
         }
 
+        /// <summary>
+        /// Obtener token utilizando el token de refresco
+        /// </summary>
+        /// <remarks>Obtener token utilizando el token de refresco</remarks>
+        /// <response code="200">Token renovado</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="500">Error interno del servidor</response>
         [Route("login/refresh")]
         [HttpPost]
         [Authorize]
