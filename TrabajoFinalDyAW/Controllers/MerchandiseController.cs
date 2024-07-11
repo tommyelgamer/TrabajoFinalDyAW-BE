@@ -78,9 +78,9 @@ namespace TrabajoFinalDyAW.Controllers
                 });
             }
 
-            var merchandise = await (from merchandise in _context.Merchandise
-                                      where merchandise.MerchandiseId == merchandiseId
-                                      select merchandise).ToListAsync();
+            var merchandise = await (from m in _context.Merchandise
+                                      where m.MerchandiseId == merchandiseId
+                                      select m).ToListAsync();
 
             if (merchandise.Count == 0) return NotFound();
 
@@ -108,22 +108,22 @@ namespace TrabajoFinalDyAW.Controllers
         public async Task<ActionResult<MerchandisePresenter>> CreateMerchandise(CreateMerchandiseDto body)
         {
             var existingMerchandise = await (from m in _context.Merchandise
-                                             where m.MerchandiseBarcode == body.MerchandiseBarcode
+                                             where m.MerchandiseBarcode == body.Barcode
                                              select m).ToListAsync();
 
             if (existingMerchandise.Count > 0) return Conflict();
 
             var merchandise = _mapper.Map<Entities.Merchandise>(body);
-            merchandise.MerchandiseId = Guid.NewGuid();
+            merchandise.Id = Guid.NewGuid();
             
             var model = _mapper.Map<Models.Merchandise>(merchandise);
-            _context.Merchandise.Add(merchandise);
+            _context.Merchandise.Add(model);
             _context.Add(model);
 
             await _context.SaveChangesAsync();
 
             return Created(
-                $"/merchandises/{merchandise.MerchandiseId}",
+                $"/merchandises/{merchandise.Id}",
                 _mapper.Map<MerchandisePresenter>(
                     _mapper.Map<Entities.Merchandise>(merchandise)
                 )
@@ -142,7 +142,7 @@ namespace TrabajoFinalDyAW.Controllers
         /// <response code="500">Error interno del servidor</response>
         [Authorize(Policy = "UPDATE_MERCHANDISE")]
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(CreateUserDto<MerchandisePresenter>), 200)]
+        [ProducesResponseType(typeof(MerchandisePresenter), 200)]
         [ProducesResponseType(typeof(BadRequestResponse), 400)]
         [ProducesResponseType(typeof(NotFoundResult), 404)]
         public async Task<ActionResult<MerchandisePresenter>> UpdateMerchandise(string id, UpdateMerchandiseDto body)
@@ -159,14 +159,14 @@ namespace TrabajoFinalDyAW.Controllers
                                              where m.MerchandiseId == merchandiseId
                                              select m).ToListAsync();
 
-            if (existingMerchandise.Count == 0) return NotFoundResult();
+            if (existingMerchandise.Count == 0) return NotFound();
 
-            _mapper.Map(body, existingMerchandise[0]);
+            _mapper.Map(body, _mapper.Map<Entities.Merchandise>(existingMerchandise[0]));
 
-            var model = _mapper.Map<Models.Merchandise>(existingMerchandise[0]);
-
-            _context.Merchandise.Update(existingMerchandise[0]);
-            _context.Update(model);
+            if (body.Name != null) existingMerchandise[0].MerchandiseName = body.Name; 
+            if (body.Barcode != null) existingMerchandise[0].MerchandiseBarcode = body.Barcode;
+            if (body.Description != null) existingMerchandise[0].MerchandiseDescription = body.Description;
+            if (body.Stock != null) existingMerchandise[0].MerchandiseStock = (int)body.Stock;
 
             await _context.SaveChangesAsync();
 
@@ -206,7 +206,7 @@ namespace TrabajoFinalDyAW.Controllers
                                              where m.MerchandiseId == merchandiseId
                                              select m).ToListAsync();
 
-            if (existingMerchandise.Count == 0) return NotFoundResult();
+            if (existingMerchandise.Count == 0) return NotFound();
 
             _context.Merchandise.Remove(existingMerchandise[0]);
             

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TrabajoFinalDyAW.DTOs;
 
 namespace TrabajoFinalDyAW.MapperProfiles
 {
@@ -6,7 +7,12 @@ namespace TrabajoFinalDyAW.MapperProfiles
     {
         public MerchandiseProfile()
         {
-            CreateMap<Entities.Merchandise, Models.Merchandise>().ReverseMap();
+            CreateMap<Entities.Merchandise, Models.Merchandise>()
+                .ForMember(
+                    dest => dest.MerchandiseId,
+                    opt => opt.MapFrom(m => m.Id)
+                )
+                .ReverseMap();
             CreateMap<Entities.Merchandise, Presenters.MerchandisePresenter>()
                 .ForMember(
                     dest => dest.Id,
@@ -28,8 +34,40 @@ namespace TrabajoFinalDyAW.MapperProfiles
                     dest => dest.Barcode,
                     opt => opt.MapFrom(m => m.MerchandiseBarcode)
                 );
-            CreateMap<DTOs.CreateMerchandiseDto, Entities.Merchandise>();
-            CreateMap<DTOs.UpdateMerchandiseDto, Entities.Merchandise>();
+            CreateMap<CreateMerchandiseDto, Entities.Merchandise>()
+                .ForMember(
+                    dest => dest.MerchandiseName,
+                    opt => opt.MapFrom(m => m.Name)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseDescription,
+                    opt => opt.MapFrom(m => m.Description)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseStock,
+                    opt => opt.MapFrom(m => m.Stock)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseBarcode,
+                    opt => opt.MapFrom(m => m.Barcode)
+                ); ;
+            CreateMap<UpdateMerchandiseDto, Entities.Merchandise>()
+                .ForMember(
+                    dest => dest.MerchandiseName,
+                    opt => opt.MapFrom(m => m.Name)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseDescription,
+                    opt => opt.MapFrom(m => m.Description)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseStock,
+                    opt => opt.MapFrom(m => m.Stock)
+                )
+                .ForMember(
+                    dest => dest.MerchandiseBarcode,
+                    opt => opt.MapFrom(m => m.Barcode)
+                ); ;
         }
     }
 }
