@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Desarrollo y Arquitecturas Web - Trabajo Final",
-        Description = "Esta es la especificación de API para el Trabajo Final de la materia Desarrollo y Arquitectura Web de la Universidad Abierta Interamericana",
+        Description = "Esta es la especificaciï¿½n de API para el Trabajo Final de la materia Desarrollo y Arquitectura Web de la Universidad Abierta Interamericana",
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -79,6 +79,11 @@ builder.Services.AddAuthorization(opt =>
     opt.AddPolicy("CREATE_USER", policy => policy.RequireClaim("permission", "CREATE_USER"));
     opt.AddPolicy("UPDATE_USER", policy => policy.RequireClaim("permission", "UPDATE_USER"));
     opt.AddPolicy("DELETE_USER", policy => policy.RequireClaim("permission", "DELETE_USER"));
+
+    opt.AddPolicy("GET_MERCHANDISE", policy => policy.RequireClaim("permission", "GET_MERCHANDISE"));
+    opt.AddPolicy("CREATE_MERCHANDISE", policy => policy.RequireClaim("permission", "CREATE_MERCHANDISE"));
+    opt.AddPolicy("UPDATE_MERCHANDISE", policy => policy.RequireClaim("permission", "UPDATE_MERCHANDISE"));
+    opt.AddPolicy("DELETE_MERCHANDISE", policy => policy.RequireClaim("permission", "DELETE_MERCHANDISE"));
 });
 
 var app = builder.Build();
