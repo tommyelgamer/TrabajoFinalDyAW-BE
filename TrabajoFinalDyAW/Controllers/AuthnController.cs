@@ -82,9 +82,15 @@ namespace TrabajoFinalDyAW.Controllers
 
                 var token = new JwtSecurityTokenHandler().WriteToken(Sectoken);
 
+                var Refclaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Sid, users[0].UserId.ToString()),
+                    new Claim(ClaimTypes.Name, users[0].UserUsername),
+                };
+
                 var Reftoken = new JwtSecurityToken(_config["Jwt:Issuer"],
                   _config["Jwt:Issuer"],
-                  claims,
+                  claims: Refclaims,
                   expires: DateTime.Now.AddDays(Double.Parse(_config["Jwt:RefreshTokenValidityInDays"])),
                   signingCredentials: credentials);
 

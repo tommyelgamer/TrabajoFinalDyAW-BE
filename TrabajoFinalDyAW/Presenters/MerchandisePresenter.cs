@@ -10,7 +10,7 @@ namespace TrabajoFinalDyAW.Presenters
         public string Name { get; set; }
         public string Description { get; set; }
         [Required]
-        public decimal Barcode { get; set; }
+        public string Barcode { get; set; }
         [Required]
         public int Stock { get; set; }
     }
